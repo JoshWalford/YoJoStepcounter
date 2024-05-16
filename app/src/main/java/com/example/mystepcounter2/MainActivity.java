@@ -18,8 +18,10 @@ import com.example.mystepcounter2.fragments.HomeFragment;
 import com.example.mystepcounter2.fragments.ProfileFragment;
 import com.example.mystepcounter2.fragments.ReportFragment;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseAuth mAuth;
     FrameLayout frameLayout;
     TabLayout tabLayout;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         frameLayout = (findViewById(R.id.framelayout));
         tabLayout = (findViewById(R.id.tabLayout));
+        mAuth = FirebaseAuth.getInstance();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.framelayout, new HomeFragment())
                 .addToBackStack(null)

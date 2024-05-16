@@ -5,6 +5,7 @@ import static android.content.Context.SENSOR_SERVICE;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,6 +13,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -27,8 +29,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mystepcounter2.R;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
@@ -40,9 +55,13 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     int stepCount = 0;
     private Sensor stepCounterSensor;
     private SensorManager sensorManager;
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+    private BarChart barChart;
+    private List<String> Week;
     private boolean isCounterSensorPresent;
     private boolean isTrackingStarted,isPaused,goalAchieved = false;
-    private CalendarView calendarView;
+    //private CalendarView calendarView;
     private int stepCountTarget = 6000;
     private long startTime;
     private float stepLenghtInMeter = 0.762f;
@@ -64,8 +83,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         if (isPaused) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             startTime -= elapsedTime;
-        } else {
-            startTime = System.currentTimeMillis();
         }
 
         goalAchieved = false;
@@ -84,6 +101,13 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -94,13 +118,14 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         pauseBtn = view.findViewById(R.id.pauseBtn);
         distance = view.findViewById(R.id.distance);
         setTarget = view.findViewById(R.id.setTarget);
+        barChart = view.findViewById(R.id.barChart);
         time = view.findViewById(R.id.time);
 
         startTime = System.currentTimeMillis();
 
         sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        calendarView = view.findViewById(R.id.calendarView);
+        //calendarView = view.findViewById(R.id.calendarView);
         calendar = Calendar.getInstance();
         progressBar.setMax(stepCountTarget);
 
@@ -165,6 +190,12 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         }
     }
 
+    private String getCurrentDate() {
+        Calendar calendar1 = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return dateFormat.format(calendar1.getTime());
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -191,8 +222,44 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             // Calculate and display distance
             float distanceInKms = stepCount * stepLenghtInMeter / 1000;
             distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
+
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                String userId = currentUser.getUid();
+                String currentData = getCurrentDate();
+                DatabaseReference userStepRef = mDatabase.child("user").child(userId).child("date").child(currentData);
+                userStepRef.child("steps").setValue(stepCount);
+            }
         }
     }
+
+    private void populateChart() {
+        ArrayList<BarEntry> entries = new ArrayList<>();
+
+        BarDataSet dataSet = new BarDataSet(entries, "Step Count");
+        BarData barData = new BarData(dataSet);
+        barChart.setData(barData);
+
+        Week = new ArrayList<>();
+        Week.add("Sunday");
+        Week.add("Monday");
+        Week.add("Tuesday");
+        Week.add("Wednesday");
+        Week.add("Thursday");
+        Week.add("Friday");
+        Week.add("Saturday");
+
+        XAxis xAxis = barChart.getXAxis(); // Get the XAxis instance
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(Week)); // Set custom value formatter
+
+        dataSet.setColor(Color.BLUE);
+        barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
+
+        // Refresh the chart
+        barChart.invalidate();
+    }
+
     private void trackProgress(int progress) {
         progressBar.setProgress(progress);
 

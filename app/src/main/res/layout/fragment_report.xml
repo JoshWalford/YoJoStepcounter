@@ -20,10 +20,10 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp">
 
-            <com.github.mikephil.charting.charts.BarChart
+            <CalendarView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/barChart" />
+                android:layout_height="match_parent">
+            </CalendarView>
 
         </androidx.cardview.widget.CardView>
 
