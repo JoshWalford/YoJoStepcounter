@@ -1,9 +1,12 @@
 package com.example.mystepcounter2.fragments;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.SENSOR_SERVICE;
+import static android.content.Intent.getIntent;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -19,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mystepcounter2.R;
+import com.example.mystepcounter2.models.User;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -37,9 +42,14 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,6 +58,7 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
 
+    User user;
     Calendar calendar;
     Button startBtn, pauseBtn;
     ProgressBar progressBar;
@@ -61,7 +72,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private List<String> Week;
     private boolean isCounterSensorPresent;
     private boolean isTrackingStarted,isPaused,goalAchieved = false;
-    //private CalendarView calendarView;
     private int stepCountTarget = 6000;
     private long startTime;
     private float stepLenghtInMeter = 0.762f;
@@ -105,6 +115,9 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference parentReference= mDatabase.child("My Database");
+        DatabaseReference userRference=parentReference.child("users");
+
     }
 
     @Override
@@ -271,9 +284,50 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             }
         }, 1000);
     }
+    public void fetchUser() {
+        try{
+            Intent intent = Intent.parseUri(uri, 0);
+
+            if (intent != null) {
+                String email = intent.getStringExtra("email");
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference parentRef = database.getReference("myDatabase");
+                DatabaseReference userRef = parentRef.child("users");
+
+                Query query = userRef.orderByChild("email").equalTo(email);
+
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                User user = userSnapshot.getValue(User.class);
+                                Log.d(TAG, "User found: " + user.getUsername());
+                                Toast.makeText(requireContext(), "User found: " + user.getUsername(), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.d(TAG, "User not found with email: " + email);
+                            Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        // Handle database error
+                        Log.w(TAG, "fetchUser:onCancelled", error.toException());
+                    }
+                });
+            }
+        } catch (URISyntaxException e ) {
+
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
 }
