@@ -2,12 +2,11 @@ package com.example.mystepcounter2.fragments;
 
 import static android.content.ContentValues.TAG;
 import static android.content.Context.SENSOR_SERVICE;
+import static android.content.Intent.getIntent;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -28,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +49,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,29 +57,28 @@ import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
+
     User user;
     Calendar calendar;
     Button startBtn, pauseBtn;
     ProgressBar progressBar;
-    TextView setGoal, distance, time, setTarget;
+    TextView setGoal, distance,time, setTarget;
     int stepCount = 0;
     private Sensor stepCounterSensor;
     private SensorManager sensorManager;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private BarChart barChart;
-    private long postDelayed;
-
+    private List<String> Week;
     private boolean isCounterSensorPresent;
-    private boolean isTrackingStarted, isPaused, goalAchieved = false;
+    private boolean isTrackingStarted,isPaused,goalAchieved = false;
     private int stepCountTarget = 6000;
     private long startTime;
-    private float stepLengthInMeter = 0.762f;
+    private float stepLenghtInMeter = 0.762f;
     private static final int ACTIVITY_RECOGNITION_PERMISSION_CODE = 101;
-    private Handler handler = new Handler();
-
     private Handler timerHandler = new Handler();
     private Runnable timerRunnable = new Runnable() {
+
         @Override
         public void run() {
             long elapsedTimeMillis = System.currentTimeMillis() - startTime;
@@ -89,18 +89,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             timerHandler.postDelayed(this, 1000);
         }
     };
-
-    // Variables to store state
-    private int initialStepCount = 0;
-    private int stepsSinceLastPause = 0;
-
     private void startTracking() {
         if (isPaused) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             startTime -= elapsedTime;
-        } else {
-            startTime = System.currentTimeMillis();
-            initialStepCount = stepsSinceLastPause = 0;
         }
 
         goalAchieved = false;
@@ -121,18 +113,16 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("myDatabase");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference parentReference= mDatabase.child("My Database");
+        DatabaseReference userRference=parentReference.child("users");
 
-        scheduleMidnightReset();
-
-        DatabaseReference parentReference = mDatabase.child("My Database");
-        DatabaseReference userReference = parentReference.child("users");
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         progressBar = view.findViewById(R.id.progressbar);
@@ -148,19 +138,15 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
         sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        //calendarView = view.findViewById(R.id.calendarView);
         calendar = Calendar.getInstance();
         progressBar.setMax(stepCountTarget);
 
         setTarget.setText("Target : " + stepCountTarget);
-
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        stepCount = sharedPreferences.getInt("currentStepCount", 0);
-        setGoal.setText(String.valueOf(stepCount));
-        progressBar.setProgress(stepCount);
-
-        if (stepCount > 0) {
-            float distanceInKms = stepCount * stepLengthInMeter / 1000;
-            distance.setText(String.format(Locale.getDefault(),"Distance: %.2f kms",distanceInKms));
+        stepCount = 0;
+        isCounterSensorPresent = (stepCounterSensor != null);
+        if (!isCounterSensorPresent) {
+            setTarget.setText("Step Counter not Available.");
         }
 
         startBtn.setOnClickListener(view1 -> {
@@ -184,18 +170,8 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 Toast.makeText(requireContext(), "Tracking has not started or you have already paused.", Toast.LENGTH_SHORT).show();
             }
         });
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            fetchUser();
-            populateChart();
-        } else {
-            Log.d(TAG, "User is not authenticated");
-            Toast.makeText(requireContext(), "User is not authenticated", Toast.LENGTH_SHORT).show();
-        }
-        return view;
+        return  view;
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -208,7 +184,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             }
         }
     }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -239,75 +214,88 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             int currentStepCount = (int) sensorEvent.values[0];
 
-            if (!isPaused && isTrackingStarted) {
-                if (initialStepCount == 0) {
-                    initialStepCount = currentStepCount;
+            // Update step count text
+            setGoal.setText(String.valueOf(currentStepCount));
+
+            // Calculate steps taken since last update
+            int stepsTaken = currentStepCount - stepCount;
+
+            // Update progress bar with steps taken
+            if (stepsTaken > 0) {
+                progressBar.incrementProgressBy(stepsTaken);
+                stepCount = currentStepCount;
+
+                // Check if goal is achieved
+                if (!goalAchieved && stepCount >= stepCountTarget) {
+                    setGoal.setText("Step Goal Achieved");
+                    goalAchieved = true;
                 }
-                stepCount = currentStepCount - initialStepCount + stepsSinceLastPause;
-                trackProgress(stepCount);
+            }
+
+            // Calculate and display distance
+            float distanceInKms = stepCount * stepLenghtInMeter / 1000;
+            distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
+
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                String userId = currentUser.getUid();
+                String currentData = getCurrentDate();
+                DatabaseReference userStepRef = mDatabase.child("user").child(userId).child("date").child(currentData);
+                userStepRef.child("steps").setValue(stepCount);
             }
         }
     }
 
     private void populateChart() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            DatabaseReference stepsRef = mDatabase.child("myDatabase").child("users").child(userId).child("steps");
-            stepsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    ArrayList<BarEntry> entries = new ArrayList<>();
-                    List<String> dates = new ArrayList<>();
-                    int index = 0;
+        ArrayList<BarEntry> entries = new ArrayList<>();
 
-                    for (DataSnapshot dateSnapshot : snapshot.getChildren()) {
-                        String date = dateSnapshot.getKey();
-                        Integer stepCount = dateSnapshot.child("steps").getValue(Integer.class);
+        BarDataSet dataSet = new BarDataSet(entries, "Step Count");
+        BarData barData = new BarData(dataSet);
+        barChart.setData(barData);
 
-                        if (stepCount != null) {
-                            entries.add(new BarEntry(index++, stepCount));
-                            dates.add(date);
-                        }
-                    }
+        Week = new ArrayList<>();
+        Week.add("Sunday");
+        Week.add("Monday");
+        Week.add("Tuesday");
+        Week.add("Wednesday");
+        Week.add("Thursday");
+        Week.add("Friday");
+        Week.add("Saturday");
 
-                    BarDataSet dataSet = new BarDataSet(entries, "Step Count");
-                    BarData barData = new BarData(dataSet);
-                    barChart.setData(barData);
+        XAxis xAxis = barChart.getXAxis(); // Get the XAxis instance
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(Week)); // Set custom value formatter
 
-                    XAxis xAxis = barChart.getXAxis();
-                    xAxis.setValueFormatter(new IndexAxisValueFormatter(dates));
+        dataSet.setColor(Color.BLUE);
+        barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
 
-                    dataSet.setColor(Color.BLUE);
-                    barChart.getDescription().setEnabled(false);
-                    barChart.getLegend().setEnabled(false);
-                    barChart.setDrawGridBackground(false);
-
-                    barChart.invalidate();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.w(TAG, "populateChart:onCancelled", error.toException());
-                }
-            });
-        } else {
-            Log.d(TAG, "User not authenticated");
-            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
-        }
+        // Refresh the chart
+        barChart.invalidate();
     }
 
+    private void trackProgress(int progress) {
+        progressBar.setProgress(progress);
+
+        // Use Handler to delay the recursive call
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                trackProgress(progress + 1);
+            }
+        }, 1000);
+    }
     public void fetchUser() {
-        Intent intent = getActivity().getIntent();
+        try{
+            Intent intent = Intent.parseUri(uri, 0);
 
-        if (intent != null) {
-            String email = intent.getStringExtra("email");
+            if (intent != null) {
+                String email = intent.getStringExtra("email");
 
-            if (email != null && !email.isEmpty()) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference parentRef = database.getReference("myDatabase").child("users");
+                DatabaseReference parentRef = database.getReference("myDatabase");
+                DatabaseReference userRef = parentRef.child("users");
 
-                Query query = parentRef.orderByChild("email").equalTo(email);
+                Query query = userRef.orderByChild("email").equalTo(email);
 
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -326,80 +314,20 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        // Handle database error
                         Log.w(TAG, "fetchUser:onCancelled", error.toException());
                     }
                 });
-            } else {
-                Log.d(TAG, "Email not found in intent");
-                Toast.makeText(requireContext(), "Email not found in intent", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Log.d(TAG, "Intent is null");
-            Toast.makeText(requireContext(), "Intent is null", Toast.LENGTH_SHORT).show();
+        } catch (URISyntaxException e ) {
+
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // No-op
+
     }
 
-    private void scheduleMidnightReset() {
-        Calendar calendar1 = Calendar.getInstance();
-
-        long currentTimeInMillis = calendar1.getTimeInMillis();
-        calendar1.set(Calendar.HOUR_OF_DAY, 24);
-        calendar1.set(Calendar.MINUTE, 0);
-        calendar1.set(Calendar.SECOND, 0);
-        long midnightTimeInMillis = calendar1.getTimeInMillis();
-
-        long delay = midnightTimeInMillis - currentTimeInMillis;
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resetDailyStep();
-                scheduleMidnightReset();
-            }
-        }, delay);
-    }
-
-    private void resetDailyStep() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("totalSteps", 0);
-        editor.apply();
-        stepCount = 0;
-        progressBar.setProgress(0);
-        setGoal.setText("0");
-    }
-
-    private void trackProgress(int currentStepCount) {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        setGoal.setText(String.valueOf(currentStepCount));
-        if (currentStepCount > 0) {
-            progressBar.setProgress(currentStepCount);
-
-            if (!goalAchieved&& currentStepCount >= stepCountTarget) {
-                setGoal.setText("Step Goal Achieved");
-                goalAchieved = true;
-            }
-        }
-
-        float distanceInKms = currentStepCount * stepLengthInMeter / 1000;
-        distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            String currentDate = getCurrentDate();
-            DatabaseReference userStepRef = mDatabase.child("myDatabase").child("users").child(userId).child("steps").child(currentDate);
-            userStepRef.child("steps").setValue(currentStepCount);
-        }
-
-        editor.putInt("totalSteps", currentStepCount);
-        editor.apply();
-    }
 }
