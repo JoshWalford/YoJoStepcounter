@@ -21,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 
 import android.os.Handler;
 import android.util.Log;
@@ -33,9 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mystepcounter2.R;
+import com.example.mystepcounter2.StepCounterViewModel;
 import com.example.mystepcounter2.models.User;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -49,11 +53,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
     User user;
@@ -67,6 +74,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private BarChart barChart;
+    private StepCounterViewModel viewModel;
     private long postDelayed;
 
     private boolean isCounterSensorPresent;
@@ -121,13 +129,33 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setRetainInstance(true);
+        viewModel = new ViewModelProvider(requireActivity()).get(StepCounterViewModel.class);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("myDatabase");
 
         scheduleMidnightReset();
 
-        DatabaseReference parentReference = mDatabase.child("My Database");
-        DatabaseReference userReference = parentReference.child("users");
+        /*DatabaseReference parentReference = mDatabase.child("My Database");
+        DatabaseReference userReference = parentReference.child("users");*/
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("stepCount", viewModel.getStepCount());
+        outState.putLong("startTime",viewModel.getStartTime());
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            int stepCount = savedInstanceState.getInt("stepCount");
+            long startTime = savedInstanceState.getLong("startTime");
+            viewModel.setStepCount(stepCount);
+            viewModel.setStartTime(startTime);
+        }
     }
 
     @Override
@@ -143,7 +171,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         barChart = view.findViewById(R.id.barChart);
         time = view.findViewById(R.id.time);
 
-        startTime = System.currentTimeMillis();
+        //startTime = System.currentTimeMillis();
 
         sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -151,11 +179,21 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         progressBar.setMax(stepCountTarget);
 
         setTarget.setText("Target : " + stepCountTarget);
-        stepCount = 0;
-        isCounterSensorPresent = (stepCounterSensor != null);
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
+        stepCount = sharedPreferences.getInt("currentStepCount",0);
+        setGoal.setText(String.valueOf(stepCount));
+        progressBar.setProgress(stepCount);
+
+        //stepCount = 0;
+        if (stepCount > 0) {
+            float distanceInKms = stepCount * stepLengthInMeter / 1000;
+            distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
+        }
+        /*isCounterSensorPresent = (stepCounterSensor != null);
         if (!isCounterSensorPresent) {
             setTarget.setText("Step Counter not Available.");
-        }
+        }*/
 
         startBtn.setOnClickListener(view1 -> {
             if (!isTrackingStarted || isPaused) {
@@ -251,18 +289,38 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             stepsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    ArrayList<BarEntry> entries = new ArrayList<>();
-                    List<String> dates = new ArrayList<>();
-                    int index = 0;
+
+                    Map<String, Integer> dayStepsMap = new HashMap<>();
+                    String[] daysOfWeek = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+                    for (String day : daysOfWeek) {
+                        dayStepsMap.put(day,0);
+                    }
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
 
                     for (DataSnapshot dateSnapshot : snapshot.getChildren()) {
                         String date = dateSnapshot.getKey();
                         Integer stepCount = dateSnapshot.child("steps").getValue(Integer.class);
 
-                        if (stepCount != null) {
-                            entries.add(new BarEntry(index++, stepCount));
-                            dates.add(date);
+                        if(date != null && stepCount != null){
+                            try {
+                                Date parsedDate = sdf.parse(date);
+                                if (parsedDate != null) {
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(parsedDate);
+                                    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                                    String dayName = daysOfWeek[(dayOfWeek - 2 + 7) % 7];
+                                    dayStepsMap.put(dayName,dayStepsMap.get(dayName) + stepCount);
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
+                    }
+
+                    ArrayList<BarEntry> entries = new ArrayList<>();
+                    for (int i = 0; i < daysOfWeek.length; i++) {
+                        entries.add(new BarEntry(i,dayStepsMap.get(daysOfWeek[i])));
                     }
 
                     BarDataSet dataSet = new BarDataSet(entries, "Step Count");
@@ -270,14 +328,28 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                     barChart.setData(barData);
 
                     XAxis xAxis = barChart.getXAxis();
-                    xAxis.setValueFormatter(new IndexAxisValueFormatter(dates));
+                    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                    xAxis.setDrawGridLines(false);
+                    xAxis.setValueFormatter(new IndexAxisValueFormatter(daysOfWeek));
+                    xAxis.setGranularity(1f);
+                    xAxis.setGranularityEnabled(true);
+
+                    YAxis leftAxis = barChart.getAxisLeft();
+                    leftAxis.setDrawGridLines(false);
+
+                    YAxis rightAxis = barChart.getAxisRight();
+                    rightAxis.setDrawGridLines(false);
+                    rightAxis.setEnabled(false);
 
                     dataSet.setColor(Color.BLUE);
                     barChart.getDescription().setEnabled(false);
                     barChart.getLegend().setEnabled(false);
-                    barChart.setDrawGridBackground(false);
+
+                    barData.setBarWidth(0.9f);
 
                     barChart.invalidate();
+
+                    barChart.animateY(1000);
                 }
 
                 @Override
@@ -372,21 +444,23 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        int previousTotalSteps = sharedPreferences.getInt("totalSteps", 0);
-        int stepsTaken = currentStepCount;
+        setGoal.setText(String.valueOf(currentStepCount));
 
-        setGoal.setText(String.valueOf(stepsTaken));
+        /*int previousTotalSteps = sharedPreferences.getInt("totalSteps", 0);
+        int stepsTaken = currentStepCount;*/
 
-        if (stepsTaken > 0) {
-            progressBar.setProgress(stepsTaken);
+       // setGoal.setText(String.valueOf(stepsTaken));
 
-            if (!goalAchieved && stepsTaken >= stepCountTarget) {
+        if (currentStepCount > 0) {
+            progressBar.setProgress(currentStepCount);
+
+            if (!goalAchieved && currentStepCount >= stepCountTarget) {
                 setGoal.setText("Step Goal Achieved");
                 goalAchieved = true;
             }
         }
 
-        float distanceInKms = stepsTaken * stepLengthInMeter / 1000;
+        float distanceInKms = currentStepCount * stepLengthInMeter / 1000;
         distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -394,7 +468,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             String userId = currentUser.getUid();
             String currentDate = getCurrentDate();
             DatabaseReference userStepRef = mDatabase.child("myDatabase").child("users").child(userId).child("steps").child(currentDate);
-            userStepRef.child("steps").setValue(stepsTaken);
+            userStepRef.child("steps").setValue(currentStepCount);
         }
 
         editor.putInt("totalSteps", currentStepCount);
