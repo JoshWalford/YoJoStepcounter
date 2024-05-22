@@ -2,6 +2,7 @@ package com.example.mystepcounter2.fragments;
 
 import static android.content.ContentValues.TAG;
 import static android.content.Context.SENSOR_SERVICE;
+import static android.graphics.Color.GREEN;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 
 import android.os.Handler;
@@ -129,8 +131,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setRetainInstance(true);
-        viewModel = new ViewModelProvider(requireActivity()).get(StepCounterViewModel.class);
+        viewModel = new ViewModelProvider(this).get(StepCounterViewModel.class);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("myDatabase");
 
@@ -171,8 +172,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         barChart = view.findViewById(R.id.barChart);
         time = view.findViewById(R.id.time);
 
-        //startTime = System.currentTimeMillis();
-
         sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         calendar = Calendar.getInstance();
@@ -185,15 +184,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         setGoal.setText(String.valueOf(stepCount));
         progressBar.setProgress(stepCount);
 
-        //stepCount = 0;
         if (stepCount > 0) {
             float distanceInKms = stepCount * stepLengthInMeter / 1000;
             distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
         }
-        /*isCounterSensorPresent = (stepCounterSensor != null);
-        if (!isCounterSensorPresent) {
-            setTarget.setText("Step Counter not Available.");
-        }*/
 
         startBtn.setOnClickListener(view1 -> {
             if (!isTrackingStarted || isPaused) {
@@ -259,13 +253,11 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             }
         }
     }
-
     private String getCurrentDate() {
         Calendar calendar1 = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return dateFormat.format(calendar1.getTime());
     }
-
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -280,7 +272,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             }
         }
     }
-
     private void populateChart() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -291,7 +282,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                     Map<String, Integer> dayStepsMap = new HashMap<>();
-                    String[] daysOfWeek = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+                    String[] daysOfWeek = {"Mon","Tues","Wednes","Thurs","Fri","Sat","Sun"};
                     for (String day : daysOfWeek) {
                         dayStepsMap.put(day,0);
                     }
@@ -331,6 +322,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                     xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
                     xAxis.setDrawGridLines(false);
                     xAxis.setValueFormatter(new IndexAxisValueFormatter(daysOfWeek));
+                    xAxis.setTextSize(10f);
                     xAxis.setGranularity(1f);
                     xAxis.setGranularityEnabled(true);
 

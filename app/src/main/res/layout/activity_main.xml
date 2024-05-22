@@ -8,15 +8,16 @@
     android:background="@color/dark_blue"
     tools:context=".MainActivity">
 
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dark_blue"
+        android:background="@color/hunter_green"
         android:layout_alignParentBottom="true"
         app:tabGravity="fill"
         app:tabMode="fixed"
-        app:tabIndicatorColor="@color/red"
+        app:tabIndicatorColor="@color/dark_blue"
         app:tabSelectedTextColor="@color/white">
 
         <com.google.android.material.tabs.TabItem

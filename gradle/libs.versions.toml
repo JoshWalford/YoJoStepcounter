@@ -14,6 +14,7 @@ googleGmsGoogleServices = "4.4.1"
 firebaseDatabase = "21.0.0"
 firebaseAnalytics = "22.0.0"
 firebaseAuth = "23.0.0"
+lifecycleViewmodelAndroid = "2.8.0"
 
 [libraries]
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
@@ -32,6 +33,7 @@ mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

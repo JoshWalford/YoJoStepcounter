@@ -1,5 +1,6 @@
 package com.example.mystepcounter2;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModel;
 
 public class StepCounterViewModel extends ViewModel {

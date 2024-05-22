@@ -12,6 +12,7 @@
         android:background="@color/dark_blue"
         tools:context=".MainActivity">
 
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -20,7 +21,7 @@
             android:layout_gravity="center"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/holo_green_light"/>
+            android:textColor="@color/hunter_green" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView1"
@@ -40,9 +41,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:text=""
+                    android:textColor="@color/hunter_green"
                     android:textAlignment="center"
                     android:textSize="20sp"
-                    android:textColor="@android:color/holo_green_light"
                     android:layout_marginTop="5dp"
                     android:textStyle="bold"/>
 
@@ -66,6 +67,7 @@
                         android:layout_width="0dp"
                         android:layout_height="30dp"
                         android:text="m"
+                        android:textColor="@color/hunter_green"
                         android:layout_weight="1"
                         android:textStyle="bold"
                         android:textSize="15sp"
@@ -78,6 +80,7 @@
                         android:layout_width="0dp"
                         android:layout_height="30dp"
                         android:text="time"
+                        android:textColor="@color/hunter_green"
                         android:layout_weight="1"
                         android:textStyle="bold"
                         android:textSize="15sp"
@@ -109,35 +112,34 @@
             app:cardCornerRadius="20dp"
             android:layout_margin="10dp">
 
-            <com.github.mikephil.charting.charts.BarChart
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/barChart" />
-
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="348dp">
+                android:layout_height="match_parent">
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/barChart"
+                    android:layout_above="@id/startBtn"/>
 
                 <Button
                     android:id="@+id/startBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="start"
-                    android:backgroundTint="@android:color/holo_green_light"
+                    android:backgroundTint="@color/hunter_green"
                     android:layout_alignParentBottom="true"
-                    android:layout_marginLeft="70dp"/>
-
+                    android:layout_marginLeft="70dp" />
 
                 <Button
                     android:id="@+id/pauseBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="Pause"
-                    android:backgroundTint="@android:color/holo_green_light"
+                    android:backgroundTint="@color/hunter_green"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="70dp"/>
+                    android:layout_marginRight="70dp" />
 
             </RelativeLayout>
 
