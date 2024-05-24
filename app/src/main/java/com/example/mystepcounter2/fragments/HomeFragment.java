@@ -79,7 +79,6 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private final int stepCountTarget = 6000;
     private static final int ACTIVITY_RECOGNITION_PERMISSION_CODE = 101;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,10 +162,9 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 if (!isAdded()) return;
 
                 long elapsedTimeMillis = System.currentTimeMillis() - stepCounterViewModel.getStartTime(); //edit made here
-                int totalSeconds = (int) (elapsedTimeMillis / 1000);
-                int minutes = totalSeconds / 60;
-                int seconds = totalSeconds % 60;
-                binding.time.setText(String.format(Locale.getDefault(), "Time: %02d:%02d", minutes, seconds));
+                int totalMinutes = (int) (elapsedTimeMillis / (1000*60));
+                int totalSeconds = (int) (elapsedTimeMillis / 1000) % 60;
+                binding.time.setText(String.format(Locale.getDefault(), "Time: %02d:%02d", totalMinutes, totalSeconds));
                 timerHandler.postDelayed(this, 1000);
             }
         };
@@ -319,7 +317,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Map<String, Integer> dayStepsMap = new HashMap<>();
-                    String[] daysOfWeek = {"Mon", "Tues", "Wednes", "Thurs", "Fri", "Sat", "Sun"};
+                    String[] daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
                     for (String day : daysOfWeek) {
                         dayStepsMap.put(day, 0);
                     }

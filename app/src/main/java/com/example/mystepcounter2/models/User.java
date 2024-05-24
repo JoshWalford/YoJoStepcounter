@@ -1,5 +1,7 @@
 package com.example.mystepcounter2.models;
 
+import java.io.Serializable;
+
 public class User {
     String username;
     String email;
@@ -8,7 +10,25 @@ public class User {
     int activeTime;
     String date;
     Double distance;
+    public User(){}
 
+    public User(String username, String email, String password, int stepCount, int activeTime, String date, Double distance) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.stepCount = stepCount;
+        this.activeTime = activeTime;
+        this.date = date;
+        this.distance = distance;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
     public int getStepCount() {
         return stepCount;
     }
@@ -39,14 +59,6 @@ public class User {
 
     public void setDistance(Double distance) {
         this.distance = distance;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
