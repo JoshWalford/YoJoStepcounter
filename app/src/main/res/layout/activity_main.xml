@@ -5,48 +5,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/dark_blue"
     tools:context=".MainActivity">
 
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/hunter_green"
         android:layout_alignParentBottom="true"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        app:tabIndicatorColor="@color/dark_blue"
-        app:tabSelectedTextColor="@color/white">
+        app:menu="@menu/botton_menu">
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Home"
-            android:icon="@drawable/home_icon"/>
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Report"
-            android:icon="@drawable/report_analytics_business_chart_graph_icon"/>
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:icon="@drawable/account_box_ic_icon"/>
-
-    </com.google.android.material.tabs.TabLayout>
-
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView2"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/framelayout"
-        android:layout_above="@id/tabLayout"/>
+        android:layout_height="650dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/navigation" />
 
 </RelativeLayout>

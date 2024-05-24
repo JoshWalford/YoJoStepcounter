@@ -1,103 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".CreateAccountActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <FrameLayout
+
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        tools:context=".CreateAccountActivity">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.cardview.widget.CardView
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            app:cardElevation="20dp"
-            app:cardCornerRadius="30dp">
+            android:layout_gravity="center">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:padding="24dp"
-                android:background="@drawable/blue_border">
+                android:orientation="vertical">
 
-                <TextView
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Welcome to Yojo's StepCounter"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="30sp">
-                </TextView>
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"
+                    android:background="@color/dark_blue"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="4dp">
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:id="@+id/userName"
-                    android:background="@drawable/grey_border"
-                    android:layout_marginTop="40dp"
-                    android:padding="8dp"
-                    android:hint="User Name"
-                    android:drawableLeft="@drawable/baseline_account_circle_24"
-                    android:drawablePadding="8dp"
-                    android:textColor="@color/white"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/blue_border"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:id="@+id/userEmail"
-                    android:background="@drawable/grey_border"
-                    android:layout_marginTop="40dp"
-                    android:padding="8dp"
-                    android:hint="User email"
-                    android:drawableLeft="@drawable/baseline_account_circle_24"
-                    android:drawablePadding="8dp"
-                    android:textColor="@color/white"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="10dp"
+                            android:text="Welcome to Yojo's StepCounter"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="30sp">
+                        </TextView>
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:id="@+id/userPassword"
-                    android:background="@drawable/grey_border"
-                    android:layout_marginTop="40dp"
-                    android:padding="8dp"
-                    android:hint="User Password"
-                    android:inputType="textPassword"
-                    android:drawableLeft="@drawable/baseline_account_circle_24"
-                    android:drawablePadding="8dp"
-                    android:textColor="@color/white"/>
+                        <EditText
+                            android:id="@+id/userName"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="40dp"
+                            android:background="@drawable/grey_border"
+                            android:drawableLeft="@drawable/baseline_account_circle_24"
+                            android:drawablePadding="8dp"
+                            android:hint="User Name"
+                            android:padding="8dp"
+                            android:textColor="@color/white"/>
 
-                <Button
-                    android:id="@+id/createBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="Create Account"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="40dp"
-                    android:background="@drawable/button_shape">
-                </Button>
+                        <EditText
+                            android:id="@+id/userEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="40dp"
+                            android:background="@drawable/grey_border"
+                            android:drawableStart="@drawable/account_box_ic_icon"
+                            android:drawablePadding="8dp"
+                            android:hint="User email"
+                            android:padding="8dp"
+                            android:textColor="@color/white"/>
+
+                        <EditText
+                            android:id="@+id/userPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="40dp"
+                            android:background="@drawable/grey_border"
+                            android:drawableStart="@drawable/lock_security_icon"
+                            android:drawablePadding="8dp"
+                            android:hint="User Password"
+                            android:inputType="textPassword"
+                            android:padding="8dp"
+                            android:textColor="@color/white"/>
+
+                        <Button
+                            android:id="@+id/createBtn"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="40dp"
+                            android:background="@drawable/button_shape"
+                            android:text="Create Account"
+                            android:textSize="20sp"
+                            android:textStyle="bold">
+                        </Button>
+
+                        <TextView
+                            android:id="@+id/loginRedirectText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:padding="0dp"
+                            android:text="Already an user? Login"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </ScrollView>
 
-    </ScrollView>
+    </FrameLayout>
 
-    </LinearLayout>
-
-</FrameLayout>
+</layout>

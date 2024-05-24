@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.HomeFragment">
@@ -12,23 +14,23 @@
         android:background="@color/dark_blue"
         tools:context=".MainActivity">
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get Stepping"
             android:textAlignment="center"
             android:layout_gravity="center"
-            android:textSize="20sp"
+            android:textSize="25sp"
             android:textStyle="bold"
-            android:textColor="@color/hunter_green" />
+            android:textColor="@color/hunter_green"
+            android:backgroundTint="@color/hunter_green"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView1"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             app:cardElevation="4dp"
-            app:cardCornerRadius="20dp"
+            app:cardCornerRadius="10dp"
             android:layout_margin="10dp">
 
             <LinearLayout
@@ -107,10 +109,13 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="320dp"
             android:elevation="4dp"
-            app:cardCornerRadius="20dp"
-            android:layout_margin="10dp">
+            app:cardCornerRadius="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -120,26 +125,53 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/barChart"
-                    android:layout_above="@id/startBtn"/>
+                    android:layout_margin="5dp">
+                </com.github.mikephil.charting.charts.BarChart>
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:cardCornerRadius="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/dark_blue">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <Button
                     android:id="@+id/startBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="start"
+                    android:text="Start"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
                     android:backgroundTint="@color/hunter_green"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginLeft="70dp" />
+                    android:layout_marginStart="70dp"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="10dp"/>
 
                 <Button
                     android:id="@+id/pauseBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="Pause"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
                     android:backgroundTint="@color/hunter_green"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="70dp" />
+                    android:gravity="center_horizontal"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="70dp"
+                    android:layout_marginTop="10dp"/>
 
             </RelativeLayout>
 
@@ -148,3 +180,5 @@
     </LinearLayout>
 
 </FrameLayout>
+
+</layout>

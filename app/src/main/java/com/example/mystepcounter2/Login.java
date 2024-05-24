@@ -2,16 +2,15 @@ package com.example.mystepcounter2;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mystepcounter2.databinding.ActivityLoginBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -19,27 +18,19 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class Login extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    private EditText loginemail, loginpassword;
-    private Button loginBtn;
-    private TextView signupRedirectText;
-
+    private ActivityLoginBinding loginBinding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        loginBinding = DataBindingUtil.setContentView(this,R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
 
-        loginemail = findViewById(R.id.login_email);
-        loginpassword = findViewById(R.id.login_password);
-        loginBtn = findViewById(R.id.login_button);
-        signupRedirectText = findViewById(R.id.signupRedirectText);
-
-        loginBtn.setOnClickListener(new View.OnClickListener() {
+        loginBinding.loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = loginemail.getText().toString();
-                String pass = loginpassword.getText().toString();
+                String email = loginBinding.loginEmail.getText().toString();
+                String pass = loginBinding.loginPassword.getText().toString();
 
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
@@ -58,19 +49,20 @@ public class Login extends AppCompatActivity {
                                     }
                                 });
                     } else {
-                        loginpassword.setError("Password cannot be empty");
+                        loginBinding.loginPassword.setError("Password cannot be empty");
                     }
                 } else if (email.isEmpty()) {
-                    loginemail.setError("Email cannot be empty");
+                    loginBinding.loginEmail.setError("Email cannot be empty");
                 } else {
-                    loginemail.setError("Please enter a vaild email address");
+                    loginBinding.loginEmail.setError("Please enter a vaild email address");
                 }
             }
         });
-        signupRedirectText.setOnClickListener(new View.OnClickListener() {
+        loginBinding.signupRedirectText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Login.this, CreateAccountActivity.class));
+                Intent intent = new Intent(Login.this,CreateAccountActivity.class);
+                startActivity(intent);
             }
         });
 

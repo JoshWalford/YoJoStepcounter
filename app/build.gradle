@@ -7,6 +7,9 @@ android {
     namespace 'com.example.mystepcounter2'
     compileSdk 34
 
+    dataBinding{
+        enable=true;
+    }
     defaultConfig {
         applicationId "com.example.mystepcounter2"
         minSdk 24
@@ -37,6 +40,8 @@ dependencies {
     implementation libs.firebase.database
     implementation libs.firebase.analytics
     implementation libs.firebase.auth
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
     def fragment_version = "1.7.0"
     implementation libs.appcompat
     implementation libs.material
