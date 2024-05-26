@@ -88,13 +88,15 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         scheduleMidnightReset();
 
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("stepCount", stepCounterViewModel.getStepCount());
         outState.putLong("startTime", stepCounterViewModel.getStartTime());
-        outState.putFloat("distance",stepCounterViewModel.getStepLengthInMeter());
+        outState.putFloat("distance", stepCounterViewModel.getStepLengthInMeter());
     }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -107,7 +109,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_home,container,false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         View view = binding.getRoot();
 
         sensorManager = (SensorManager) requireActivity().getSystemService(SENSOR_SERVICE);
@@ -117,11 +119,11 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         binding.setTarget.setText("Target : " + stepCountTarget);
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        stepCounterViewModel.setStepCount(sharedPreferences.getInt("currentStepCount",0));
+        stepCounterViewModel.setStepCount(sharedPreferences.getInt("currentStepCount", 0));
         binding.setGoal.setText(String.valueOf(stepCounterViewModel.getStepCount())); //edit made here
         binding.progressbar.setProgress(stepCounterViewModel.getStepCount()); //edit made here
 
-        if (stepCounterViewModel.getStepCount()> 0) { //edit made here
+        if (stepCounterViewModel.getStepCount() > 0) { //edit made here
             float distanceInKms = stepCounterViewModel.getStepCount() * stepCounterViewModel.getStepLengthInMeter() / 1000; //edit made here X2
             binding.distance.setText(String.format(Locale.getDefault(), "Distance: %.2f kms", distanceInKms));
         }
@@ -162,7 +164,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 if (!isAdded()) return;
 
                 long elapsedTimeMillis = System.currentTimeMillis() - stepCounterViewModel.getStartTime(); //edit made here
-                int totalMinutes = (int) (elapsedTimeMillis / (1000*60));
+                int totalMinutes = (int) (elapsedTimeMillis / (1000 * 60));
                 int totalSeconds = (int) (elapsedTimeMillis / 1000) % 60;
                 binding.time.setText(String.format(Locale.getDefault(), "Time: %02d:%02d", totalMinutes, totalSeconds));
                 timerHandler.postDelayed(this, 1000);
@@ -170,6 +172,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         };
         return view;
     }
+
     private void startTracking() {
         if (isPaused) {
             long elapsedTime = System.currentTimeMillis() - stepCounterViewModel.getStartTime(); //edit made here
@@ -187,11 +190,13 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         isTrackingStarted = true;
         isPaused = false;
     }
+
     private void pauseTracking() {
         sensorManager.unregisterListener(this);
         timerHandler.removeCallbacks(timerRunnable);
         isPaused = true;
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -213,6 +218,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             sensorManager.unregisterListener(this, stepCounterSensor);
         }
     }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -227,6 +233,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             }
         }
     }
+
     private void trackProgress(int currentStepCount) {
         if (!isAdded()) return;
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
@@ -266,6 +273,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     user = snapshot.getValue(User.class);
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     Log.e(TAG, "fetchUser:onCancelled", error.toException());
@@ -273,10 +281,12 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             });
         }
     }
+
     private String getCurrentDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return dateFormat.format(calendar.getTime());
     }
+
     private void scheduleMidnightReset() {
         Calendar calendar1 = Calendar.getInstance();
 
@@ -292,6 +302,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
             scheduleMidnightReset();
         }, delay);
     }
+
     private void resetDailyStep() {
         stepCounterViewModel.setStepCount(0);
         stepsSinceLastPause = 0;
@@ -305,9 +316,11 @@ public class HomeFragment extends Fragment implements SensorEventListener {
         binding.setGoal.setText("0");
         binding.distance.setText("Distance: 0.00kms");
     }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
+
     private void populateChart() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {

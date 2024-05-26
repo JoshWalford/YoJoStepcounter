@@ -10,7 +10,9 @@ public class User {
     int activeTime;
     String date;
     Double distance;
-    public User(){}
+
+    public User() {
+    }
 
     public User(String username, String email, String password, int stepCount, int activeTime, String date, Double distance) {
         this.username = username;
@@ -29,6 +31,7 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
     public int getStepCount() {
         return stepCount;
     }

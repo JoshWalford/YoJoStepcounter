@@ -3,30 +3,23 @@ package com.example.mystepcounter2;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.FrameLayout;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.mystepcounter2.fragments.HomeFragment;
-import com.example.mystepcounter2.fragments.ProfileFragment;
-import com.example.mystepcounter2.fragments.ReportFragment;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private AdView mAdView;
+
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -34,7 +27,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MobileAds.initialize(this);
+
         mAuth = FirebaseAuth.getInstance();
+
+
+        mAdView = findViewById(R.id.bannerAd);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView2);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();
 
-            NavigationUI.setupWithNavController(bottomNavigationView,navController);
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
         } else {
             throw new IllegalStateException("NavHostFragment is null");
         }

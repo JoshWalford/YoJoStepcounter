@@ -54,6 +54,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(requireContext(), "item"+ item, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "item" + item, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -92,7 +93,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item1 = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(requireContext(), "item"+ item1, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "item" + item1, Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -101,7 +102,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item2 = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(requireContext(), "item"+ item2, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "item" + item2, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -109,7 +110,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item3 = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(requireContext(), "item"+ item3, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "item" + item3, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -117,7 +118,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item4 = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(requireContext(), "item"+ item4, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "item" + item4, Toast.LENGTH_SHORT).show();
             }
         });
 

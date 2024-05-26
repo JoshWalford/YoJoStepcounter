@@ -19,10 +19,11 @@ import com.google.firebase.auth.FirebaseAuth;
 public class Login extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ActivityLoginBinding loginBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loginBinding = DataBindingUtil.setContentView(this,R.layout.activity_login);
+        loginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -34,7 +35,7 @@ public class Login extends AppCompatActivity {
 
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
-                        mAuth.signInWithEmailAndPassword(email,pass)
+                        mAuth.signInWithEmailAndPassword(email, pass)
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
@@ -61,7 +62,7 @@ public class Login extends AppCompatActivity {
         loginBinding.signupRedirectText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Login.this,CreateAccountActivity.class);
+                Intent intent = new Intent(Login.this, CreateAccountActivity.class);
                 startActivity(intent);
             }
         });
