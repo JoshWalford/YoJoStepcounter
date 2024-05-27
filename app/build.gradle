@@ -36,13 +36,13 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation libs.play.services.ads
     implementation libs.activity
     implementation libs.firebase.database
     implementation libs.firebase.analytics
     implementation libs.firebase.auth
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
-    implementation libs.play.services.ads
     implementation libs.firebase.firestore
     def fragment_version = "1.7.0"
     implementation libs.appcompat

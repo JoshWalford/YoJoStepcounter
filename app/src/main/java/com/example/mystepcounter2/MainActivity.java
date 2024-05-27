@@ -10,6 +10,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.mystepcounter2.fragments.ProfileFragment;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -27,10 +28,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String username = getIntent().getStringExtra("username");
+
+
         MobileAds.initialize(this);
 
         mAuth = FirebaseAuth.getInstance();
-
 
         mAdView = findViewById(R.id.bannerAd);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -46,5 +49,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             throw new IllegalStateException("NavHostFragment is null");
         }
+
+        ProfileFragment profileFragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        profileFragment.getArguments(bundle);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainerView2,profileFragment)
+                .commit();
     }
 }

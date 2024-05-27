@@ -26,9 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileFragment extends Fragment {
-
-    Button editBtn;
-    TextView user_textView;
     private FragmentProfileBinding profileBinding;
     String[] item = {"On the home screen click the START button to start counting steps. To pause it press the PAUSE button. You can then resume counting using the START button"};
     String[] item1 = {"The built in sensor in you is used to count the steps. The accuracy of the steps wold be based on how good the sensor is in your phone."};
@@ -58,6 +55,13 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         profileBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_profile,container,false);
         View view = profileBinding.getRoot();
+
+        Bundle args = getArguments();
+        if (args != null) {
+            String username = args.getString("username");
+
+            profileBinding.userNameTxt.setText(username);
+        }
 
         autoCompleteTextView = view.findViewById(R.id.auto_completeTxt);
         autoCompleteTextView1 = view.findViewById(R.id.auto_completeTxt1);
@@ -127,5 +131,8 @@ public class ProfileFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void getArguments(Bundle bundle) {
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -16,7 +17,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -54,9 +54,12 @@ public class CreateAccountActivity extends AppCompatActivity {
             } else {
                 mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        makeUsers();
-                        Toast.makeText(CreateAccountActivity.this, "Signup Succesfull", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(CreateAccountActivity.this, Login.class));
+                        //makeUsers();
+                        Runnable callback = () -> {
+                            Toast.makeText(CreateAccountActivity.this, "Signup Succesfull", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(CreateAccountActivity.this, Login.class));
+                        };
+                        makeUsers(callback);
                     } else {
                         Toast.makeText(CreateAccountActivity.this, "Sign Up Failed" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -69,7 +72,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         });
     }
 
-    public void makeUsers() {
+    public void makeUsers(Runnable callback) {
         // Get input values from EditText fields
         String username = userBinding.userName.getText().toString().trim();
         String email = userBinding.userEmail.getText().toString().trim();
@@ -92,9 +95,17 @@ public class CreateAccountActivity extends AppCompatActivity {
         DatabaseReference parentRef = database.getReference("myDatabase");
         DatabaseReference userRef = parentRef.child("users");
         // Add the new user to the database with a unique key
-        userRef.push().setValue(user);
+        userRef.push().setValue(user).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                callback.run();
+            } else {
+                Log.e(TAG, "Failed to save user", task.getException());
+                Toast.makeText(CreateAccountActivity.this, "Failed to save user", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Create a query to sort users by username
-        Query query = userRef.orderByChild(user.getUsername());
+        /*Query query = userRef.orderByChild(user.getUsername());
         // Add a listener to handle the sorted data
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -109,9 +120,8 @@ public class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
-        });
+        });*/
     }
 
 
@@ -119,13 +129,37 @@ public class CreateAccountActivity extends AppCompatActivity {
         protected void onStart () {
             super.onStart();
             FirebaseUser currentUser = mAuth.getCurrentUser();
-            updateUI(currentUser);
+            if (currentUser !=null) {
+                loadUserDataAndStartMainActivity(currentUser);
+            }
+            //updateUI(currentUser);
         }
 
-        private void updateUI (FirebaseUser currentUser){
+    private void loadUserDataAndStartMainActivity(FirebaseUser currentUser) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("myDatabase").child("users");
+        userRef.orderByChild("email").equalTo(currentUser.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        updateUI(currentUser);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+    }
+
+    private void updateUI (FirebaseUser currentUser){
             if (currentUser != null) {
                 Intent intent = new Intent(CreateAccountActivity.this, MainActivity.class);
                 intent.putExtra("email", currentUser.getEmail());
+                intent.putExtra("username",user.getUsername());
                 startActivity(intent);
                 finish();
             }
