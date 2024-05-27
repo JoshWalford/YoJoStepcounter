@@ -1,13 +1,12 @@
 package com.example.mystepcounter2.fragments;
 
-import static android.content.ContentValues.TAG;
-
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +17,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mystepcounter2.EditAccount;
 import com.example.mystepcounter2.R;
-import com.example.mystepcounter2.models.User;
+import com.example.mystepcounter2.databinding.FragmentProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class ProfileFragment extends Fragment {
 
     Button editBtn;
     TextView user_textView;
+    private FragmentProfileBinding profileBinding;
     String[] item = {"On the home screen click the START button to start counting steps. To pause it press the PAUSE button. You can then resume counting using the START button"};
     String[] item1 = {"The built in sensor in you is used to count the steps. The accuracy of the steps wold be based on how good the sensor is in your phone."};
     String[] item2 = {"Upon shaking of you phone it may register as a step. This is not a bug. This is based on the in built sensor."};
@@ -56,12 +54,10 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        editBtn = view.findViewById(R.id.editBtn);
-        user_textView = view.findViewById(R.id.userName_textView);
+        profileBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_profile,container,false);
+        View view = profileBinding.getRoot();
 
         autoCompleteTextView = view.findViewById(R.id.auto_completeTxt);
         autoCompleteTextView1 = view.findViewById(R.id.auto_completeTxt1);
@@ -80,6 +76,7 @@ public class ProfileFragment extends Fragment {
         autoCompleteTextView2.setAdapter(adapteritems2);
         autoCompleteTextView3.setAdapter(adapteritems3);
         autoCompleteTextView4.setAdapter(adapteritems4);
+
 
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -122,13 +119,13 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        editBtn.setOnClickListener(new View.OnClickListener() {
+        profileBinding.editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //soon get back to you
+                Intent intent = new Intent(requireActivity(), EditAccount.class);
+                startActivity(intent);
             }
         });
         return view;
-
     }
 }

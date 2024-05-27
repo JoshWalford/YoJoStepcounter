@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavHostController;
@@ -16,13 +18,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.mystepcounter2.R;
+import com.example.mystepcounter2.databinding.FragmentReportBinding;
 
 public class ReportFragment extends Fragment {
+    private FragmentReportBinding reportBinding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_report, container, false);
+        reportBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_report,container,false);
+        View view = reportBinding.getRoot();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Alert");

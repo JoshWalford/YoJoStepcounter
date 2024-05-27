@@ -5,5 +5,14 @@
     <string name="my_profile">My Profile</string>
     <string name="profile_image">Profile Image</string>
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="weekly_summary">Weekly summary</string>
+    <string name="instructions">Instructions</string>
+    <string name="how_to_use">How to use</string>
+    <string name="accuracy">Accuracy</string>
+    <string name="counting_when_shaking_phone">Counting when shaking phone</string>
+    <string name="battery_saving">Battery saving</string>
+    <string name="step_goal">Step goal</string>
+    <string name="username">UserName</string>
+    <string name="personal_information">Personal Information</string>
 
 </resources>

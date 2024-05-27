@@ -18,6 +18,7 @@ lifecycleViewmodelAndroid = "2.8.0"
 navigationFragment = "2.7.7"
 navigationUi = "2.7.7"
 playServicesAds = "23.0.0"
+firebaseFirestore = "25.0.0"
 
 [libraries]
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
@@ -40,6 +41,7 @@ lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

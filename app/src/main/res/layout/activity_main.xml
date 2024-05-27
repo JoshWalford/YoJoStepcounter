@@ -21,6 +21,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView2"
         android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_above="@id/bannerAd"
         android:layout_width="match_parent"
         android:layout_height="650dp"
         app:defaultNavHost="true"

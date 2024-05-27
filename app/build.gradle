@@ -43,6 +43,7 @@ dependencies {
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
     implementation libs.play.services.ads
+    implementation libs.firebase.firestore
     def fragment_version = "1.7.0"
     implementation libs.appcompat
     implementation libs.material

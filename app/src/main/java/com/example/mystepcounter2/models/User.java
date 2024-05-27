@@ -3,25 +3,55 @@ package com.example.mystepcounter2.models;
 import java.io.Serializable;
 
 public class User {
+    int stepCount;
+    int activeTime;
+    int height;
+    int weight;
     String username;
     String email;
     String password;
-    int stepCount;
-    int activeTime;
     String date;
+    String gender;
     Double distance;
 
     public User() {
     }
 
-    public User(String username, String email, String password, int stepCount, int activeTime, String date, Double distance) {
+    public User(int stepCount, int activeTime, int height, int weight, String username, String email, String password, String date, String gender, Double distance) {
+        this.stepCount = stepCount;
+        this.activeTime = activeTime;
+        this.height = height;
+        this.weight = weight;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.stepCount = stepCount;
-        this.activeTime = activeTime;
         this.date = date;
+        this.gender = gender;
         this.distance = distance;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getUsername() {
